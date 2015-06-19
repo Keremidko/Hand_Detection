@@ -27,7 +27,10 @@
     <ClInclude Include="classifier.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="preprocessor.h">
+    <ClInclude Include="imageProcessor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="debugger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -41,7 +44,10 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="preprocessor.cpp">
+    <ClCompile Include="imageProcessor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="debugger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

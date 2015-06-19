@@ -3,7 +3,7 @@
 #include <opencv2/highgui/highgui.hpp>
 
 #include "classifier.h"
-#include "preprocessor.h"
+#include "imageProcessor.h"
 
 #include <iostream>
 
@@ -13,7 +13,7 @@ using namespace std;
 char key = '_';
 Mat src, roi, seg;
 Classifier seg_cls;
-Preprocessor preprocessor;
+ImageProcessor imgProcessor;
 VideoCapture cam;
 const Rect roi_rect(0, 0, 400, 300);
 
@@ -30,15 +30,14 @@ int main()
 		roi = src(roi_rect).clone();
 		
 		//preprocessing
-		preprocessor.BlurImage(roi);
-		preprocessor.ConvertToHsv(roi);
-		preprocessor.MakeUnimodal(roi);
+		imgProcessor.BlurImage(roi);
+		imgProcessor.ConvertToHsv(roi);
+		imgProcessor.MakeUnimodal(roi);
+		
 
 		seg_cls.SegmentImage(roi, seg);
-		// TO DO
-		// Create morphological structuring element - rectangle with size 5x5
-		// Execute morphological opening on the seg matrix and store the result into morph
-
+		imgProcessor.clearNoise(seg);
+		imgProcessor.CreateConvexHull(seg);
 
 		// Display degug info
 		rectangle(src, roi_rect, Scalar(0, 0, 255), 2);

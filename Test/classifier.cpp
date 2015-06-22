@@ -60,9 +60,11 @@ void Classifier::LearnGaussian()
 	thresh_v = max / 5;
 
 	// At the end you should have updated all those variables:
+	/*
 	cout << "   Mean H: " << mean_h << "   Var H: " << var_h << "   Thresh H: " << thresh_h << endl;
 	cout << "   Mean S: " << mean_s << "   Var S: " << var_s << "   Thresh S: " << thresh_s << endl;
 	cout << "   Mean V: " << mean_v << "   Var V: " << var_v << "   Thresh V: " << thresh_v << endl;
+	*/
 }
 
 void Classifier::SegmentImage(const Mat& src, Mat& out) {

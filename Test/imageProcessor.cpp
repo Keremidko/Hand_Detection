@@ -10,6 +10,10 @@ using namespace std;
 
 int findBiggestContour(vector<vector<Point>> contours);
 double findCos(Point start, Point end, Point far);
+double euclidianDistance(Point& p1, Point& p2);
+void mergeFingerPoints(vector<Point>& points, vector<Point>& mergedPoints);
+
+const int MERGE_THRESHOLD = 18;
 
 void ImageProcessor::BlurImage(Mat& dest) {
 	Mat input = dest.clone();
@@ -45,7 +49,10 @@ void ImageProcessor::clearNoise(Mat& src) {
 	//imshow("border", border);
 }
 
-void ImageProcessor::CreateConvexHull(Mat& src) {
+/* !!!!!!!!!!!!!!!!!!!!!!!!!!!!
+ * This SHIT needs Refactoring!	
+ */
+void ImageProcessor::CreateConvexHull(Mat& src, vector<Point>& fingerPoints, vector<Point>& insidePoints) {
 	vector<vector<Point>> contours;
 	Mat input = src.clone();
 	findContours(input, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_NONE);
@@ -69,6 +76,9 @@ void ImageProcessor::CreateConvexHull(Mat& src) {
 		drawContours(drawing, hull, i, colorHull, 1);
 	}
 
+	//vector<Point> fingerPoints;
+	vector<Point> insidePoints;
+	vector<Point> mergedPoints;
 	if (contours.size() > 0) { 
 		int biggestContour = findBiggestContour(contours);
 
@@ -85,19 +95,58 @@ void ImageProcessor::CreateConvexHull(Mat& src) {
 			double cos = findCos(startPoint, endPoint, farPoint);
 
 			if (cos > -0.1 && depth > 30) {
-				circle(drawing, endPoint, 4, Scalar(100, 0, 255), 2);
-				circle(drawing, farPoint, 4, Scalar(100, 255, 100), 2);
-				circle(drawing, startPoint, 4, Scalar(100, 0, 255), 2);
+				//fingerPoints.push_back(startPoint);
+				fingerPoints.push_back(endPoint);
+				insidePoints.push_back(farPoint);
 			}
-
-			//line(drawing, startPoint, farPoint, CV_RGB(0, 255, 0), 2);
-			//line(drawing, endPoint, farPoint, CV_RGB(0, 255, 0), 2);
-			//circle(drawing, startPoint, 4, Scalar(100, 0, 255), 2);
 		}
-		cout << endl;
+
+		drawCircles(drawing, fingerPoints, Scalar(100,0, 255));
+		drawCircles(drawing, insidePoints, Scalar(100, 255, 100));
+		std::ostringstream str;
+		str << "Fingers count:" << fingerPoints.size();
+		putText(drawing, str.str(), Point(10,20), CV_FONT_HERSHEY_PLAIN, 1, Scalar(0,0,255));
 	}
 
 	imshow("contours+hull", drawing);
+}
+
+void ImageProcessor::drawCircles(Mat& drawing, vector<Point>& points, Scalar& color) {
+	for (int i = 0; i < points.size(); i++ ) {
+		circle(drawing, points[i], 4, color, 7);
+	}
+}
+
+void mergeFingerPoints(vector<Point>& inputPoints, vector<Point>& mergedPoints) {
+	vector<Point> points = inputPoints;
+
+	if (points.size() == 0)
+		return;
+
+	for (int i = 0; i < points.size() - 1; i++) {
+		Point p1 = points[i];
+		Point cache = p1;
+		int counter = 1;
+
+		/* Find centroid point for all points near p1, considering MERGE_THRESHOLD distance */
+		for (int j = i + 1; j < points.size(); j++) {
+			Point p2 = points[j];
+			if (euclidianDistance(p1, p2) < MERGE_THRESHOLD) {
+				points.erase(std::remove(points.begin(), points.end(), p2), points.end());
+				cache += p2;
+				counter++;
+				break;
+			}
+		}
+
+		cache = cache / counter;
+		mergedPoints.push_back(cache);
+	}
+}
+
+double euclidianDistance(Point& p1, Point& p2) {
+	Point diff = p1 - p2;
+	return sqrt(diff.x*diff.x + diff.y + diff.y);
 }
 
 double findCos(Point start, Point end, Point far){

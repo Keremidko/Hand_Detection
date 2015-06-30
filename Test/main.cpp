@@ -15,6 +15,8 @@ Mat src, roi, seg;
 Classifier seg_cls;
 ImageProcessor imgProcessor;
 VideoCapture cam;
+vector<Point> fingerPoints, insidePoints;
+bool train = false;
 const Rect roi_rect(0, 0, 400, 300);
 
 void initCamera();
@@ -25,6 +27,9 @@ int main()
 
 	do
 	{
+		fingerPoints.clear();
+		insidePoints.clear();
+
 		//get roi
 		cam >> src;
 		roi = src(roi_rect).clone();
@@ -37,7 +42,9 @@ int main()
 
 		seg_cls.SegmentImage(roi, seg);
 		imgProcessor.clearNoise(seg);
-		imgProcessor.CreateConvexHull(seg);
+		imgProcessor.CreateConvexHull(seg, fingerPoints, insidePoints);
+		imgProcessor.drawCircles(src, fingerPoints, Scalar(0, 100, 255));
+		imgProcessor.drawCircles(src, insidePoints, Scalar(100, 255, 0));
 
 		// Display degug info
 		rectangle(src, roi_rect, Scalar(0, 0, 255), 2);

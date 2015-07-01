@@ -13,4 +13,5 @@ public:
 	void clearNoise(Mat& src);
 	void CreateConvexHull(Mat& src, vector<Point>& points, vector<Point>& insidePoints);
 	void drawCircles(Mat& drawing, vector<Point>& points, Scalar& color);
+	void putText(Mat& drawing, string text);
 };

@@ -105,7 +105,7 @@ void ImageProcessor::CreateConvexHull(Mat& src, vector<Point>& fingerPoints, vec
 		drawCircles(drawing, insidePoints, Scalar(100, 255, 100));
 		std::ostringstream str;
 		str << "Fingers count:" << fingerPoints.size();
-		putText(drawing, str.str(), Point(10,20), CV_FONT_HERSHEY_PLAIN, 1, Scalar(0,0,255));
+		cv::putText(drawing, str.str(), Point(10,30), CV_FONT_HERSHEY_PLAIN, 2, Scalar(255,255,255), 2);
 	}
 
 	imshow("contours+hull", drawing);

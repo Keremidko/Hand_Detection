@@ -19,6 +19,8 @@ vector<Point> fingerPoints, insidePoints;
 bool train = false;
 const Rect roi_rect(0, 0, 400, 300);
 
+string classify(vector<Point>& inputPoints);
+
 void initCamera();
 
 int main()
@@ -43,8 +45,16 @@ int main()
 		seg_cls.SegmentImage(roi, seg);
 		imgProcessor.clearNoise(seg);
 		imgProcessor.CreateConvexHull(seg, fingerPoints, insidePoints);
-		imgProcessor.drawCircles(src, fingerPoints, Scalar(0, 100, 255));
+		imgProcessor.drawCircles(src, fingerPoints, Scalar(255, 100, 0));
 		imgProcessor.drawCircles(src, insidePoints, Scalar(100, 255, 0));
+
+		std::ostringstream str;
+		str << "Fingers count:" << fingerPoints.size();
+		cv::putText(src, str.str(), Point(10, 30), CV_FONT_HERSHEY_PLAIN, 2, Scalar(0, 0, 0), 2);
+
+		std::ostringstream clsString;
+		clsString << "Class: " + classify(fingerPoints);
+		cv::putText(src, clsString.str(), Point(10, 60), CV_FONT_HERSHEY_PLAIN, 2, Scalar(0, 0, 0), 2);
 
 		// Display degug info
 		rectangle(src, roi_rect, Scalar(0, 0, 255), 2);
@@ -55,6 +65,20 @@ int main()
 	} while (key != 'q');
 
 	return 0;
+}
+
+string classify(vector<Point>& inputPoints) {
+	int size = inputPoints.size();
+	switch (size) {
+	case 5 :
+		return "open";
+	case 2 :
+		return "rock";
+	case 1 :
+		return "closed";
+	default :
+		return "unknown";
+	}
 }
 
 void onMouse(int event, int x, int y, int flags, void* data)

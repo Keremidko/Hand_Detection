@@ -12,3 +12,5 @@ Implementation:
 - Get defect points
 - Calculate cosine between Convex Hull points, and defect points.
 - Based on cosine threshold - classify the point as finger tip, or not
+
+![alt text](https://github.com/ShtiliyanUzunov/uni_project_hand_detection/blob/master/images/hand_detection_overview.png)

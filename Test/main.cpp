@@ -19,6 +19,8 @@ vector<Point> fingerPoints, insidePoints;
 bool train = false;
 const Rect roi_rect(0, 0, 400, 300);
 
+bool event_set = false;
+
 string classify(vector<Point>& inputPoints);
 
 void initCamera();
@@ -49,12 +51,13 @@ int main()
 		imgProcessor.drawCircles(src, insidePoints, Scalar(100, 255, 0));
 
 		std::ostringstream str;
-		str << "Fingers count:" << fingerPoints.size();
-		cv::putText(src, str.str(), Point(10, 30), CV_FONT_HERSHEY_PLAIN, 2, Scalar(0, 0, 0), 2);
+		
+		str << "Fingers count:" << fingerPoints.size() + 1;
+		cv::putText(src, str.str(), Point(10, 30), cv::FONT_HERSHEY_PLAIN, 2, Scalar(0, 0, 0), 2);
 
 		std::ostringstream clsString;
 		clsString << "Class: " + classify(fingerPoints);
-		cv::putText(src, clsString.str(), Point(10, 60), CV_FONT_HERSHEY_PLAIN, 2, Scalar(0, 0, 0), 2);
+		cv::putText(src, clsString.str(), Point(10, 60), cv::FONT_HERSHEY_PLAIN, 2, Scalar(0, 0, 0), 2);
 
 		// Display degug info
 		rectangle(src, roi_rect, Scalar(0, 0, 255), 2);
@@ -70,9 +73,13 @@ int main()
 string classify(vector<Point>& inputPoints) {
 	int size = inputPoints.size();
 	switch (size) {
-	case 5 :
+	case 5:
 		return "open";
-	case 2 :
+	case 4:
+		return "open";
+	case 3:
+		return "scissors";
+	case 2:
 		return "rock";
 	case 1 :
 		return "closed";
@@ -81,11 +88,12 @@ string classify(vector<Point>& inputPoints) {
 	}
 }
 
-void onMouse(int event, int x, int y, int flags, void* data)
+static void onMouse(int event, int x, int y, int flags, void* data)
 {
+
 	switch (event)
 	{
-	case CV_EVENT_LBUTTONUP: { 
+	case cv::EVENT_LBUTTONUP: {
 		int index = (x + y * roi.cols) * 3;
 		Point3i pixel(roi.data[index], roi.data[index + 1], roi.data[index + 2]);
 		seg_cls.AddPoint(pixel);
@@ -96,8 +104,8 @@ void onMouse(int event, int x, int y, int flags, void* data)
 }
 
 void initCamera() {
-	namedWindow("Image");
-	setMouseCallback("Image", onMouse);
+	cv::namedWindow("Image", cv::WINDOW_AUTOSIZE);
+	cv::setMouseCallback("Image", onMouse, 0);
 
 	cam = VideoCapture(0);
 

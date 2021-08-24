@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "imageProcessor.h"
 #include "opencv2/highgui/highgui.hpp"
-#include "highgui.h"
+//#include "highgui.h"
 #include <math.h>
 #include <iostream>
 
@@ -21,8 +21,9 @@ void ImageProcessor::BlurImage(Mat& dest) {
 }
 
 void ImageProcessor::ConvertToHsv(Mat& dest) {
+
 	Mat input = dest.clone();
-	cvtColor(input, dest, CV_BGR2HSV);
+	cvtColor(input, dest, cv::COLOR_BGR2HSV);
 }
 
 void ImageProcessor::MakeUnimodal(Mat& src) {
@@ -49,13 +50,10 @@ void ImageProcessor::clearNoise(Mat& src) {
 	//imshow("border", border);
 }
 
-/* !!!!!!!!!!!!!!!!!!!!!!!!!!!!
- * This SHIT needs Refactoring!	
- */
 void ImageProcessor::CreateConvexHull(Mat& src, vector<Point>& fingerPoints, vector<Point>& insidePoints) {
 	vector<vector<Point>> contours;
 	Mat input = src.clone();
-	findContours(input, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_NONE);
+	findContours(input, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_NONE);
 
 	Scalar colorContours = Scalar(255, 0, 0);
 	Scalar colorHull = Scalar(0, 255, 0);
@@ -77,7 +75,7 @@ void ImageProcessor::CreateConvexHull(Mat& src, vector<Point>& fingerPoints, vec
 	}
 
 	//vector<Point> fingerPoints;
-	vector<Point> insidePoints;
+	//vector<Point> insidePoints;
 	vector<Point> mergedPoints;
 	if (contours.size() > 0) { 
 		int biggestContour = findBiggestContour(contours);
@@ -104,8 +102,8 @@ void ImageProcessor::CreateConvexHull(Mat& src, vector<Point>& fingerPoints, vec
 		drawCircles(drawing, fingerPoints, Scalar(100,0, 255));
 		drawCircles(drawing, insidePoints, Scalar(100, 255, 100));
 		std::ostringstream str;
-		str << "Fingers count:" << fingerPoints.size();
-		cv::putText(drawing, str.str(), Point(10,30), CV_FONT_HERSHEY_PLAIN, 2, Scalar(255,255,255), 2);
+		str << "Fingers count:" << fingerPoints.size() + 1;
+		cv::putText(drawing, str.str(), Point(10,30), cv::FONT_HERSHEY_PLAIN, 2, Scalar(255,255,255), 2);
 	}
 
 	imshow("contours+hull", drawing);
